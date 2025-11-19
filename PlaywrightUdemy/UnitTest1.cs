@@ -1,4 +1,4 @@
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 using PlaywrightUdemy.Pages;
 
@@ -12,6 +12,7 @@ public class Tests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.Self)]
     public async Task Test1()
     {
         var pw = await Playwright.CreateAsync();
@@ -47,6 +48,7 @@ public class Tests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.Self)]
     public async Task TestWithPom()
     {
         var pw = await Playwright.CreateAsync();
@@ -67,6 +69,28 @@ public class Tests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.Self)]
+    public async Task TestWithPomByRole()
+    {
+        var pw = await Playwright.CreateAsync();
+        var browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        {
+            Headless = false
+        });
+        var context = await browser.NewContextAsync();
+        var page = await context.NewPageAsync();
+
+        await page.GotoAsync("http://www.eaapp.somee.com");
+
+        var loginPage = new LoginPageByRole(page);
+        await loginPage.ClickLogin();
+        await loginPage.Login("admin", "password");
+        var isExist = await loginPage.IsEmployeePresent();
+        Assert.IsTrue(isExist);
+    }
+
+    [Test]
+    [Parallelizable(ParallelScope.Self)]
     public async Task TestNetwork()
     {
         var pw = await Playwright.CreateAsync();
@@ -90,5 +114,42 @@ public class Tests
         await loginPage.ClickEmployeeListLink();
         var request = await waitRequest;
         var response = await waitResponse;
+    }
+
+    [Test]
+    [Parallelizable(ParallelScope.Self)]
+    public async Task TestNetworkInterception()
+    {
+        var pw = await Playwright.CreateAsync();
+        var browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        {
+            Headless = false
+        });
+        var context = await browser.NewContextAsync();
+        var page = await context.NewPageAsync();
+
+        // Блокировка картинок
+        //await page.RouteAsync("**/*",
+        //    async route =>
+        //    {
+        //        if (route.Request.ResourceType == "image")
+        //        {
+        //            await route.AbortAsync();
+        //        }
+        //        else
+        //        {
+        //            await route.ContinueAsync();
+        //        }
+        //    });
+
+        page.Request += (_, request) => Console.WriteLine(request.Method + " --- " + request.Url);
+        page.Response += (_, response) => Console.WriteLine((int)response.Status + " --- " + response.Url);
+
+        await page.GotoAsync("https://www.flipkart.com/");
+    }
+
+    private void Page_Request(object? sender, IRequest e)
+    {
+        throw new NotImplementedException();
     }
 }

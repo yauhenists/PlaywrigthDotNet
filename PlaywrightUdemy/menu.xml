@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<fastfoodmenu>
+	<item>
+		<name>Classic Cheeseburger</name>
+		<price>5.99</price>
+		<calories>450</calories>
+	</item>
+	<item>
+		<name>Bacon Burger</name>
+		<price>7.49</price>
+		<calories>620</calories>
+	</item>
+	<item>
+		<name>Veggie Burger</name>
+		<price>6.99</price>
+		<calories>380</calories>
+	</item>
+</fastfoodmenu>
